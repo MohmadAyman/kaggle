@@ -28,54 +28,48 @@ console.log(process.argv[2])
 
 k = process.argv[2];
 
-// for (var k = 6; k < 9; k++) {
-    console.log(topics[k]);
-    console.log(topics[k].toString());
-    var writer = csvWriter({ headers: [topics[k]]})
-    writer.pipe(fs.createWriteStream(k+'.csv'))
-    for (var i = 0; i < 5; i++) {
-            googleTrends.interestOverTime({keyword: topics[k], startTime: new Date(dates[i]), 
-                endTime: new Date(dates[i+1])}, function(err, results) {
-              if (err) console.log('oh no error!', err);
-              else {
-                json_result = JSON.parse(results);
-                // for (var j = 0; j < json_result['default']['timelineData'].length; j++) {
-                // trends[json[k]].push(json_result['default']['timelineData']);
-                // }
-                console.log(json_result['default']['timelineData'].length);
-                if(json_result['default']['timelineData'].length == 0){
-                    if(i==0 || i==1){
-                        days_diff = diff1;  
-                    }else if(i==2 || i==3){
-                        days_diff = diff1;
-                    }else{
-                        days_diff = diff1;   
-                    }
-                    console.log(days_diff);
-                    for (var j = 0; j < days_diff; j++) {
-                        // console.log(json_result['default']['timelineData'][j].value);
-                        writer.write([0]);
-                        wrote++;
-                        console.log(wrote);
-                    }
-                }else{
-                    for (var j = 0; j < json_result['default']['timelineData'].length; j++) {
-                        // console.log(json_result['default']['timelineData'][j].value);
-                        writer.write([json_result['default']['timelineData'][j].value])
-                        wrote++;
-                        console.log(wrote);
-                    }
-                }
-              } 
-            }).then(function(){
-                if(i==4){
-                    end_writing();
-                }
-            })
-        i++;
-    }
-// }
+console.log(topics[k]);
 
+var writer = csvWriter({ headers: [topics[k]]})
+writer.pipe(fs.createWriteStream('../trends/'+k+'.csv'))
+
+for (var i = 0; i < 5; i++) {
+        googleTrends.interestOverTime({keyword: topics[k], startTime: new Date(dates[i]), 
+            endTime: new Date(dates[i+1])}, function(err, results) {
+          if (err) console.log('oh no error!', err);
+          else {
+
+            json_result = JSON.parse(results);
+
+            if(json_result['default']['timelineData'].length == 0){
+                if(i==0 || i==1){
+                    days_diff = diff1;  
+                }else if(i==2 || i==3){
+                    days_diff = diff2;
+                }else{
+                    days_diff = diff3;   
+                }
+
+                for (var j = 0; j < days_diff; j++) {
+                    // console.log(json_result['default']['timelineData'][j].value);
+                    writer.write([0]);
+                    wrote++;
+                }
+            }else{
+                for (var j = 0; j < json_result['default']['timelineData'].length; j++) {
+                    // console.log(json_result['default']['timelineData'][j].value);
+                    writer.write([json_result['default']['timelineData'][j].value])
+                    wrote++;
+                }
+            }
+          } 
+        }).then(function(){
+            if(i==4){
+                end_writing();
+            }
+        })
+    i++;
+}
 
 var end_writing = function(){
     console.log('time to stop');
